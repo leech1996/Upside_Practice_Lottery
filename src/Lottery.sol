@@ -19,7 +19,7 @@ contract Lottery{
     uint16 public winningNumber;
 
     address[] private buyers;
-    mapping(address => buyerInfo)[] private buyerInfos;
+    mapping(uint256 => mapping(address => buyerInfo)) private buyerInfos;
     
     constructor() {
         round = 0;
@@ -27,18 +27,16 @@ contract Lottery{
         buyerNum = 0;
         isDrawn = false;
         isClaimed = false;
-        buyerInfos.push();
     }
    
     function buy(uint16 n) public payable {
         require(msg.value == 0.1 ether , "insufficient");
-        buyerInfo storage b;
-        b = buyerInfos[round][msg.sender];
-        require(!b.isInTheRound, "no duplicate");
+        require(!buyerInfos[round][msg.sender].isInTheRound, "no duplicate");
         require(block.timestamp < startTime + 24 hours, "sellphase ended");
+
         buyers.push(msg.sender);
-        b.numberPicked = n;
-        b.isInTheRound = true;
+        buyerInfos[round][msg.sender].numberPicked = n;
+        buyerInfos[round][msg.sender].isInTheRound = true;
         buyerNum += 1;
     }
 
@@ -93,7 +91,6 @@ contract Lottery{
         buyerNum = 0;
         isDrawn = false;
         isClaimed = false;
-        buyerInfos.push();
         buyers = new address[](0);
     }
 
