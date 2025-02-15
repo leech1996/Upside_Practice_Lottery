@@ -64,13 +64,10 @@ contract Lottery{
         
         require(block.timestamp >= startTime + 24 hours, "ongoing sellphase");
         require(isDrawn, "not yet");
-
         isClaimed = true;
-        buyerInfo storage b;
-        b = buyerInfos[round][msg.sender];
 
-        if(b.numberPicked == winningNumber){
-            b.prizeClaimed = true;
+        if(buyerInfos[round][msg.sender].numberPicked == winningNumber){
+            buyerInfos[round][msg.sender].prizeClaimed = true;
             address(msg.sender).call{value: prize}("");
             if(address(this).balance == 0){
                startNewRound();
